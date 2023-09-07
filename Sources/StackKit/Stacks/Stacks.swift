@@ -2,8 +2,13 @@ import UIKit
 
 public extension UIView {
     @discardableResult
+    func VStack(ignoreSafeArea: Bool = true, @ResultBuilder<UIView> views: () -> [UIView]) -> UIStackView {
+        createStack(.vertical, views: views(), ignoreSafeArea: ignoreSafeArea)
+    }
+    
+    @discardableResult
     func ZStack(
-        useSafeArea: Bool = true,
+        ignoreSafeArea: Bool = true,
         @ResultBuilder<UIView> views: () -> [UIView]
     ) -> UIStackView {
         let container = UIView()
@@ -12,23 +17,17 @@ public extension UIView {
             container.VStack { view }
         }
 
-        return VStack(useSafeArea: useSafeArea) { container }
+        return VStack(ignoreSafeArea: ignoreSafeArea) { container }
     }
 
-    @discardableResult
-    func VStack(
-        useSafeArea: Bool = true,
-        @ResultBuilder<UIView> views: () -> [UIView]
-    ) -> UIStackView {
-        createStack(.vertical, views: views(), useSafeArea: useSafeArea)
-    }
+    
 
     @discardableResult
     func HStack(
-        useSafeArea: Bool = true,
+        ignoreSafeArea: Bool = true,
         @ResultBuilder<UIView> views: () -> [UIView]
     ) -> UIStackView {
-        createStack(.horizontal, views: views(), useSafeArea: useSafeArea)
+        createStack(.horizontal, views: views(), ignoreSafeArea: ignoreSafeArea)
     }
 }
 
@@ -88,7 +87,7 @@ extension UIView {
         spacing: CGFloat = .zero,
         alignment: UIStackView.Alignment = .fill,
         distribution: UIStackView.Distribution = .fill,
-        useSafeArea: Bool
+        ignoreSafeArea: Bool
     ) -> UIStackView {
         let stackView = UIStackView(arrangedSubviews: views)
         stackView.axis = axis
@@ -100,10 +99,14 @@ extension UIView {
         stackView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: useSafeArea ? safeAreaLayoutGuide.topAnchor : topAnchor),
-            stackView.trailingAnchor.constraint(equalTo: useSafeArea ? safeAreaLayoutGuide.trailingAnchor : trailingAnchor),
-            stackView.bottomAnchor.constraint(equalTo: useSafeArea ? safeAreaLayoutGuide.bottomAnchor : bottomAnchor),
-            stackView.leadingAnchor.constraint(equalTo: useSafeArea ? safeAreaLayoutGuide.leadingAnchor : leadingAnchor)
+            stackView.topAnchor.constraint(equalTo: ignoreSafeArea ? topAnchor :
+                                            safeAreaLayoutGuide.topAnchor),
+            stackView.trailingAnchor.constraint(equalTo: ignoreSafeArea ? trailingAnchor :
+                                                    safeAreaLayoutGuide.trailingAnchor),
+            stackView.bottomAnchor.constraint(equalTo: ignoreSafeArea ? bottomAnchor :
+                                                safeAreaLayoutGuide.bottomAnchor),
+            stackView.leadingAnchor.constraint(equalTo: ignoreSafeArea ? leadingAnchor :
+                                                safeAreaLayoutGuide.leadingAnchor)
         ])
         
         return stackView
